@@ -1,0 +1,5 @@
+---
+BasedOnStyle: InheritParentConfig
+IndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 4
