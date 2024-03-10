@@ -3,17 +3,18 @@
 These are the notes I wanted to take during the workshop.
 
 <!-- TOC -->
-* [Menno's class notes](#mennos-class-notes)
-  * [Setup](#setup)
-    * [Installing VM](#installing-vm)
-  * [1. Build a kernel](#1-build-a-kernel)
-  * [2. Build a module](#2-build-a-module)
-  * [3. Start kernel in GDB](#3-start-kernel-in-gdb)
-  * [4. Patch the kernel](#4-patch-the-kernel)
-  * [5. Add a new syscall](#5-add-a-new-syscall)
-  * [6, 7, 8, 9. Add page-cache hit/miss counters to the Linux kernel](#6-7-8-9-add-page-cache-hitmiss-counters-to-the-linux-kernel)
-<!-- TOC -->
 
+* [Menno's class notes](#mennos-class-notes)
+    * [Setup](#setup)
+        * [Installing VM](#installing-vm)
+    * [1. Build a kernel](#1-build-a-kernel)
+    * [2. Build a module](#2-build-a-module)
+    * [3. Start kernel in GDB](#3-start-kernel-in-gdb)
+    * [4. Patch the kernel](#4-patch-the-kernel)
+    * [5. Add a new syscall](#5-add-a-new-syscall)
+    * [6, 7, 8, 9. Add page-cache hit/miss counters to the Linux kernel](#6-7-8-9-add-page-cache-hitmiss-counters-to-the-linux-kernel)
+
+<!-- TOC -->
 
 ## Setup
 
@@ -85,26 +86,92 @@ Linux 6.8.0-rc7.0+ x86_64
 
 ## 2. Build a module
 
-* [ ] [Building (out of the tree) kernel modules](../README.md#building-out-of-the-tree-kernel-modules)
-* [ ] [These are the bare-bones to start with building out of tree kernel modules:](../README.md#these-are-the-bare-bones-to-start-with-building-out-of-tree-kernel-modules)
-    * [ ] [Suggestions to expand the skeleton module, as bonus exercises:](../README.md#suggestions-to-expand-the-skeleton-module-as-bonus-exercises)
+While building the dummy-kmod, I ran into the error:
+
+```
+make[1]: *** /lib/modules/6.8.0-rc7.0+build: No such file or directory.  Stop.
+```
+
+I thought this was due to the custom kernel version that we installed in step 1.
+So I tried to switch back to the default fedora kernel and reboot:
+
+```bash
+$ sudo grubby --info=ALL
+...
+index=2
+kernel="/boot/vmlinuz-6.7.7-200.fc39.x86_64"
+...
+$ sudo grubby --set-default-index=2
+```
+
+But then I realized the make file is simply missing a `/` on line 2:
+
+```diff
+diff --git a/dummy-kmod/Makefile b/dummy-kmod/Makefile
+index 343636a..0be24f1 100644
+--- a/dummy-kmod/Makefile
++++ b/dummy-kmod/Makefile
+@@ -1,5 +1,5 @@
+ obj-m += hello.o 
+-KDIR:=/lib/modules/$(shell uname -r)build
++KDIR:=/lib/modules/$(shell uname -r)/build
+ all:
+        $(MAKE) -C $(KDIR) M=$(PWD) modules
+```
+
+Spice/webdav has messed up permission bits, so I copied the dummy-kmod to a local folder inside the vm:
+
+```bash
+cp -r kernel_workshop/dummy-kmod ./
+sudo chmod -R 644 ./dummy-kmod
+```
+
+Then I could finally build the module:
+
+```bash
+$ make
+make -C /lib/modules/6.8.0-rc7.0+/build M=/home/menno/Workspace/dummy-kmod modules
+make[1]: Entering directory '/home/menno/Workspace/linux/build'
+  CC [M]  /home/menno/Workspace/dummy-kmod/hello.o
+  MODPOST /home/menno/Workspace/dummy-kmod/Module.symvers
+  CC [M]  /home/menno/Workspace/dummy-kmod/hello.mod.o
+  LD [M]  /home/menno/Workspace/dummy-kmod/hello.ko
+  BTF [M] /home/menno/Workspace/dummy-kmod/hello.ko
+make[1]: Leaving directory '/home/menno/Workspace/linux/build'
+$ sudo insmod hello.ko
+$ sudo dmesg
+...
+[ 2518.680182] hello: loading out-of-tree module taints kernel.
+[ 2518.680187] hello: module verification failed: signature and/or required key missing - tainting kernel
+[ 2518.680879] Hello, kernel world!
+$ sudo rmmod hello.ko
+$ sudo dmesg
+...
+[ 2975.023056] Goodbye, kernel world!
+```
+
+* [x] [Building (out of the tree) kernel modules](../README.md#building-out-of-the-tree-kernel-modules)
+* [x] [These are the bare-bones to start with building out of tree kernel modules:](../README.md#these-are-the-bare-bones-to-start-with-building-out-of-tree-kernel-modules)
+    * [x] [Suggestions to expand the skeleton module, as bonus exercises:](../README.md#suggestions-to-expand-the-skeleton-module-as-bonus-exercises)
+
+## 3. Start kernel in debugger
+
 * [ ] [Running the new kernel with QEMU.](../README.md#running-the-new-kernel-with-qemu)
     * [ ] [Preparing to run the kernel](../README.md#preparing-to-run-the-kernel)
 * [ ] [Running the kernel with QEMU](../README.md#running-the-kernel-with-qemu)
-
-## 3. Start kernel in GDB
-
 * [ ] [Debugging the kernel with GDB](../README.md#debugging-the-kernel-with-gdb)
     * [ ] [Changing the QEMU command](../README.md#changing-the-qemu-command)
     * [ ] [Starting GDB](../README.md#starting-gdb)
 * [ ] [Stop the kernel and find the corresponding source](../README.md#stop-the-kernel-and-find-the-corresponding-source)
 
 ## 4. Patch the kernel
+
 * [ ] [Kernel Patching](../README.md#kernel-patching)
     * [ ] [Creating a kernel patch](../README.md#creating-a-kernel-patch)
     * [ ] [Applying and removing a patch to the unchanged kernel.](../README.md#applying-and-removing-a-patch-to-the-unchanged-kernel)
 
 ## 5. Add a new syscall
+
 * [ ] [Defining a new System Call and creating a patch to distribute it.](../README.md#defining-a-new-system-call-and-creating-a-patch-to-distribute-it)
     * [ ] [Implementation](../README.md#implementation)
     * [ ] [Rebuilding the kernel to add the new system call.](../README.md#rebuilding-the-kernel-to-add-the-new-system-call)
