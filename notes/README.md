@@ -150,6 +150,22 @@ $ sudo dmesg
 [ 2975.023056] Goodbye, kernel world!
 ```
 
+For bonus exercise #1 I made a kmod called [echo](../dummy-kmod/echo.c), and I implemented some features to print
+variables using a template. I did not realize that the variables in bonus exercise #2 are preprocessor defines,
+that can not be accessed by name at runtime. The kernel does have a list of (debug)symbols that you can access,
+but to the best of my knowledge the preprocessor defines are lost/expanded during compilation.
+I solved this by making a lookup function that converts returns the define values `get_variable_value()`.
+
+Then I can run and compile echo like follows:
+
+```bash
+$ cp ../kernel_workshop/dummy-kmod/echo.c ./ && make
+$ sudo insmod echo.ko template='"hey this is the HZ ${HZ} and the user HZ ${USER_HZ}"'
+$ sudo rmmod echo.ko && sudo dmesg -c
+[43659.632454] hey this is the HZ 1000 and the user HZ 100
+[43660.897518] Goodbye, from echo!
+```
+
 * [x] [Building (out of the tree) kernel modules](../README.md#building-out-of-the-tree-kernel-modules)
 * [x] [These are the bare-bones to start with building out of tree kernel modules:](../README.md#these-are-the-bare-bones-to-start-with-building-out-of-tree-kernel-modules)
     * [x] [Suggestions to expand the skeleton module, as bonus exercises:](../README.md#suggestions-to-expand-the-skeleton-module-as-bonus-exercises)
