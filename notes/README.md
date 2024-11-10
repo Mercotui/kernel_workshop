@@ -9,7 +9,7 @@ These are the notes I wanted to take during the workshop.
         * [Installing VM](#installing-vm)
     * [1. Build a kernel](#1-build-a-kernel)
     * [2. Build a module](#2-build-a-module)
-    * [3. Start kernel in GDB](#3-start-kernel-in-gdb)
+    * [3. Start kernel in debugger](#3-start-kernel-in-debugger)
     * [4. Patch the kernel](#4-patch-the-kernel)
     * [5. Add a new syscall](#5-add-a-new-syscall)
     * [6, 7, 8, 9. Add page-cache hit/miss counters to the Linux kernel](#6-7-8-9-add-page-cache-hitmiss-counters-to-the-linux-kernel)
@@ -169,6 +169,19 @@ $ sudo rmmod echo.ko && sudo dmesg -c
 * [x] [Building (out of the tree) kernel modules](../README.md#building-out-of-the-tree-kernel-modules)
 * [x] [These are the bare-bones to start with building out of tree kernel modules:](../README.md#these-are-the-bare-bones-to-start-with-building-out-of-tree-kernel-modules)
     * [x] [Suggestions to expand the skeleton module, as bonus exercises:](../README.md#suggestions-to-expand-the-skeleton-module-as-bonus-exercises)
+
+//TODO(Menno 2024.11.10) Saving the following tabs for further reference:
+
+- https://www.kernel.org/doc/html/v6.8-rc7/
+- https://tldp.org/LDP/lkmpg/2.6/html/x323.html
+- https://github.com/torvalds/linux/blob/master/include/linux/moduleparam.h
+- https://www.kernel.org/doc/html/v4.10/dev-tools/index.html
+- https://lwn.net/Articles/948408/
+- https://github.com/torvalds/linux/blob/master/include/linux/seq_buf.h
+- https://github.com/torvalds/linux/blob/master/lib/seq_buf.c#L93
+- https://docs.kernel.org/doc-guide/kernel-doc.html
+- https://archive.kernel.org/oldlinux/htmldocs/kernel-api/libc.html#id-1.4.3
+- https://return42.github.io/linuxdoc/kernel-doc-intro.html#kernel-doc-intro-example-out
 
 ## 3. Start kernel in debugger
 
